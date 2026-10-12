@@ -1,0 +1,97 @@
+<!doctype html><html lang="zh-CN" data-skin="canvas"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atlas Map · 工具群岛</title>
+<link rel="stylesheet" href="fonts.css"><style>
+:root{--sea:#e8eef0;--ink:#13202a;--mute:#6b7c86;--acc:#2546ff}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{background:var(--sea);color:var(--ink);font:13px/1.5 Inter,"PingFang SC","Noto Sans CJK SC",sans-serif;user-select:none}
+#vp{position:fixed;inset:40px 0 0 0;cursor:grab;background-image:radial-gradient(circle,rgba(19,32,42,.13) 1px,transparent 1.4px);background-size:28px 28px}
+#vp.drag{cursor:grabbing}#w{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.isl{position:absolute;border-radius:60px;background:radial-gradient(ellipse at 30% 20%,#fff,#f6f3ea 70%);box-shadow:0 0 0 14px rgba(255,255,255,.45),0 0 0 30px rgba(255,255,255,.22),0 40px 80px -30px rgba(19,32,42,.35);padding:110px 50px 50px}
+.isl h2{position:absolute;left:50px;top:26px;margin:0;font:400 64px/1 Disp,"Songti SC",serif;letter-spacing:-.02em;white-space:nowrap}.isl h2 small{font:500 14px Inter;color:var(--mute);margin-left:14px;letter-spacing:.1em;text-transform:uppercase}
+.isl .num{position:absolute;right:46px;top:30px;font:12px Mono;color:var(--acc)}
+.t{position:absolute;width:200px;height:170px;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px rgba(0,0,0,.3);transition:transform .25s,box-shadow .25s,opacity .3s,filter .3s;cursor:pointer}
+.t:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 30px 50px -20px rgba(19,32,42,.45);z-index:3}
+.t .im{height:112px;background:#dfe5e8;overflow:hidden}.t img.p{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.t .ph{height:100%;display:grid;place-items:center;font:italic 52px Disp,serif;color:#fff}
+.t .c{padding:8px 11px;display:flex;flex-direction:column;gap:1px}.t b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.t span{font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t.dim{opacity:.12;filter:grayscale(1)}.t.hit{box-shadow:0 0 0 3px var(--acc),0 20px 40px -16px rgba(37,70,255,.6)}
+.t .sp{position:absolute;top:8px;left:8px;background:var(--acc);color:#fff;font-size:10px;padding:1px 7px;border-radius:9px}
+.far .t .c,.far .t .sp{visibility:hidden}.far .t{border-radius:8px}
+/* hud */
+.hud{position:fixed;z-index:10;background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(1.5);border:1px solid rgba(19,32,42,.08);border-radius:18px;box-shadow:0 20px 50px -24px rgba(19,32,42,.4)}
+.brand{top:60px;left:20px;padding:16px 20px}.brand h1{margin:0;font:400 34px/1 Disp,serif;letter-spacing:-.02em}.brand h1 i{color:var(--acc)}.brand p{margin:6px 0 0;color:var(--mute);max-width:280px}
+.sbox{top:60px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 18px;width:min(520px,50vw)}
+.sbox input{flex:1;border:0;outline:none;background:none;font:15px Inter,sans-serif;color:var(--ink);padding:8px 0}.sbox span{font:11px Mono;color:var(--mute)}
+.sbox button,.ctl button{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:8px 12px;font:12px Inter;cursor:pointer}
+.legend{top:178px;left:20px;padding:10px;max-height:calc(100vh - 420px);overflow:auto;width:230px}.legend button{display:flex;width:100%;justify-content:space-between;border:0;background:none;padding:6px 10px;border-radius:10px;font:12.5px Inter,"PingFang SC";cursor:pointer;color:var(--ink)}
+.legend button:hover{background:rgba(37,70,255,.08);color:var(--acc)}.legend i{font-style:normal;font:11px Mono;color:var(--mute)}
+.mini{right:20px;bottom:20px;padding:8px;width:240px}.mini canvas{display:block;width:224px;border-radius:10px;cursor:pointer}.mini div{font:11px Mono;color:var(--mute);padding:6px 4px 0;display:flex;justify-content:space-between}
+.ctl{right:20px;top:60px;padding:6px;display:flex;gap:6px}.ctl button{background:#fff;color:var(--ink);border:1px solid rgba(0,0,0,.08)}
+.tip{left:20px;bottom:20px;padding:10px 16px;font-size:12px;color:var(--mute)}.tip b{color:var(--ink)}
+.dr{background:#fff;border-radius:22px 0 0 22px;box-shadow:-30px 0 80px -30px rgba(0,0,0,.4)}.dph{background:linear-gradient(135deg,var(--acc),#9ad);color:#fff;font-family:Disp}
+.dr h2{font:400 48px/1 Disp,serif;margin:8px 0}.dk{font:11px Mono;color:var(--acc);text-transform:uppercase}.dzh{font-weight:600}.dd,.do,.dm{color:var(--mute)}
+.da>*{border:1px solid #ddd;background:#fff;border-radius:12px;padding:10px 16px;font:13px Inter;color:var(--ink)}.da .go{background:var(--acc);color:#fff;border-color:var(--acc)}.dx{border:0;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;width:34px;height:34px}
+.toast{background:var(--ink);color:#fff;border-radius:12px}
+.fl{top:118px;left:50%;transform:translateX(-50%);padding:8px 10px;display:flex;flex-direction:column;gap:6px;width:min(720px,56vw);align-items:center}
+.fl .r1{display:flex;gap:6px;align-items:center}.fl button{border:1px solid rgba(19,32,42,.12);background:#fff;border-radius:999px;padding:4px 11px;font:12px Inter,"PingFang SC";cursor:pointer;color:var(--ink)}
+.fl button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.fl .tg{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}.fl .tg button{font-size:11px;padding:2px 9px}.fl .tg button.on{background:var(--acc);border-color:var(--acc)}.fl .sep{width:1px;height:18px;background:rgba(0,0,0,.12);margin:0 4px}
+.legend button.on{background:rgba(37,70,255,.12);color:var(--acc)}.empty{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font:italic 40px Disp,serif;color:var(--mute)}
+</style></head><body>
+<div id="vp"><div id="w"></div></div>
+<div class="hud brand"><h1>Atlas <i>Map</i></h1><p>工具群岛 · 拖拽漫游，滚轮缩放。地图采用固定浅色配色。</p></div>
+<div class="hud sbox"><input id="q" placeholder="搜索，回车飞到下一个结果…" autocomplete="off"><span id="hc"></span><button id="nx">下一个 →</button></div>
+<div class="hud fl"><div class="r1" id="tabs"><button data-t="tool">工具</button><button data-t="person">人物</button><button data-t="fav">收藏</button><span class="sep"></span><button data-s="cat">按分类</button><button data-s="az">A–Z</button></div><div class="tg" id="tg"></div></div>
+<div class="hud ctl"><button id="zi">＋</button><button id="zo">－</button><button id="fit">全景</button><button id="rnd">随机</button></div>
+<div class="hud legend" id="lg"></div>
+<div class="hud mini"><canvas id="mm" width="448" height="300"></canvas><div><span>MINIMAP</span><span id="zl"></span></div></div>
+<div class="hud tip"><b>拖拽</b> 漫游 · <b>滚轮</b> 缩放 · <b>/</b> 搜索 · <b>0</b> 全景 · 点图例聚焦分类</div><div id="em"></div>
+<script src="data.js"></script><script src="common.js"></script><script>
+const TW=200,TH=170,G=18,PAL=['#2546ff','#ff5b3a','#11a37f','#e8a600','#8a3ffc','#0aa5c2','#e8457a','#5b6b00','#ff8a00','#3d7bff'];
+const COL={};[...CATS,'People','Favorites'].forEach((c,i)=>COL[c]=PAL[i%PAL.length]);
+let isl=[],pos={},WW=1,WH=1,MS=1,s=.3,tx=0,ty=0,anim,hits=[],hi=-1;
+const VH=()=>innerHeight-40;
+function build(){saveST();const r=results({noCat:true}),gm=new Map();
+ r.forEach(x=>{const k=ST.tab==='person'?'People':ST.tab==='fav'?(x.p?'People':x.c):x.c;if(!gm.has(k))gm.set(k,[]);gm.get(k).push(x)});
+ let groups=[...gm.entries()];if(ST.sort!=='az')groups.sort((a,b)=>b[1].length-a[1].length);else groups.sort((a,b)=>a[0].localeCompare(b[0]));
+ isl=[];pos={};let html='',X=0,Y=0,rowH=0;const MAXW=Math.max(2400,Math.sqrt(r.length)*560);
+ groups.forEach(([c,it],gi)=>{const cols=Math.max(3,Math.ceil(Math.sqrt(it.length*1.6))),rows=Math.ceil(it.length/cols);
+  const w=cols*(TW+G)-G+100,h=rows*(TH+G)-G+160;if(X&&X+w>MAXW){X=0;Y+=rowH+160;rowH=0}
+  const ox=X+(gi%3)*20,oy=Y+(gi%2)*60;isl.push({c,x:ox,y:oy,w,h,col:COL[c]||PAL[0],n:it.length});
+  html+=`<section class="isl" data-c="${esc(c)}" style="left:${ox}px;top:${oy}px;width:${w}px;height:${h}px"><h2>${esc(c==='People'?'人物':CN[c])}<small>${esc(c)}</small></h2><span class="num">${String(gi+1).padStart(2,'0')} · ${it.length}</span>`;
+  it.forEach((x,i)=>{const tx=50+(i%cols)*(TW+G),ty=110+Math.floor(i/cols)*(TH+G);pos[x.u]={x:ox+tx+TW/2,y:oy+ty+TH/2};
+   html+=`<div class="t" data-u="${esc(x.u)}" style="left:${tx}px;top:${ty}px">${x.sp?'<em class="sp">赞助</em>':''}<div class="im">${x.img?`<img class="p" loading="lazy" src="${x.img}" alt="">`:`<div class="ph" style="background:linear-gradient(135deg,${COL[c]||PAL[0]},#13202a)">${esc(ini(x.n))}</div>`}</div><div class="c"><b>${FAV.has(x.u)?'★ ':''}${esc(x.n)}</b><span>${esc(x.zh)}</span></div></div>`});
+  html+='</section>';X+=w+160;rowH=Math.max(rowH,h)});
+ WW=Math.max(1,...isl.map(i=>i.x+i.w));WH=Math.max(1,...isl.map(i=>i.y+i.h));MS=Math.min(448/WW,300/WH);
+ $('#w').innerHTML=html;hits=ST.q?r.map(x=>x.u):[];hi=-1;$('#hc').textContent=ST.q||ST.tags.length?r.length+' 个结果':'';
+ $('#em').innerHTML=r.length?'':'<div class="empty">这片海域没有岛屿 —— 换个条件试试</div>';
+ $('#lg').innerHTML=isl.map((i,k)=>`<button data-k="${k}" class="${ST.cat===i.c?'on':''}"><span><span style="color:${i.col}">●</span> ${esc(i.c==='People'?'人物':CN[i.c])}</span><i>${i.n}</i></button>`).join('');
+ $$('#tabs [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===ST.tab));$$('#tabs [data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s===ST.sort));
+ $('#tg').innerHTML=tagCounts().map(([t,n])=>`<button class="${ST.tags.includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)} ${n}</button>`).join('');apply()}
+function apply(){$('#w').style.transform=`translate(${tx}px,${ty}px) scale(${s})`;$('#w').classList.toggle('far',s<.32);$('#zl').textContent=Math.round(s*100)+'%';mini()}
+function fly(x,y,ns,dur=700){cancelAnimationFrame(anim);const s0=s,x0=tx,y0=ty,ex=innerWidth/2-x*ns,ey=VH()/2-y*ns,t0=performance.now();
+ const st=t=>{let k=Math.min(1,(t-t0)/dur);k=1-Math.pow(1-k,4);s=s0+(ns-s0)*k;tx=x0+(ex-x0)*k;ty=y0+(ey-y0)*k;apply();if(k<1)anim=requestAnimationFrame(st)};anim=requestAnimationFrame(st)}
+function fit(d){fly(WW/2,WH/2,Math.min(innerWidth/WW,VH()/WH)*.86,d)}
+function focusIsl(c,d){const i=isl.find(k=>k.c===c);if(i)fly(i.x+i.w/2,i.y+i.h/2,Math.min(.9,Math.min(innerWidth/i.w,VH()/i.h)*.8),d);return !!i}
+const mm=$('#mm'),cx=mm.getContext('2d');
+function mini(){cx.clearRect(0,0,448,300);cx.fillStyle='#dfe7ea';cx.fillRect(0,0,448,300);isl.forEach(i=>{cx.fillStyle=i.col;cx.globalAlpha=.75;cx.beginPath();cx.roundRect?cx.roundRect(i.x*MS,i.y*MS,i.w*MS,i.h*MS,8):cx.rect(i.x*MS,i.y*MS,i.w*MS,i.h*MS);cx.fill()});cx.globalAlpha=1;
+ cx.fillStyle='#ff2d55';hits.forEach(u=>{const p=pos[u];p&&cx.fillRect(p.x*MS-2,p.y*MS-2,4,4)});
+ cx.strokeStyle='#13202a';cx.lineWidth=2;cx.strokeRect(-tx/s*MS,-ty/s*MS,innerWidth/s*MS,VH()/s*MS)}
+mm.onclick=e=>{const r=mm.getBoundingClientRect();fly((e.clientX-r.left)/r.width*448/MS,(e.clientY-r.top)/r.height*300/MS,Math.max(s,.5))};
+let dn=null,moved=0;const vp=$('#vp');
+vp.onpointerdown=e=>{dn={x:e.clientX,y:e.clientY,tx,ty};moved=0;vp.classList.add('drag');cancelAnimationFrame(anim)};
+addEventListener('pointermove',e=>{if(!dn)return;moved=Math.hypot(e.clientX-dn.x,e.clientY-dn.y);tx=dn.tx+e.clientX-dn.x;ty=dn.ty+e.clientY-dn.y;apply()});
+addEventListener('pointerup',e=>{if(dn&&moved<5){const t=e.target.closest('.t');if(t)openDrawer(D.find(x=>x.u===t.dataset.u))}dn=null;vp.classList.remove('drag')});
+vp.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(anim);const f=Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015)),ns=Math.min(2.2,Math.max(.05,s*f)),cy=e.clientY-40;tx=e.clientX-(e.clientX-tx)*ns/s;ty=cy-(cy-ty)*ns/s;s=ns;apply()},{passive:false});
+const zoom=f=>{const ns=Math.min(2.2,Math.max(.05,s*f));fly((innerWidth/2-tx)/s,(VH()/2-ty)/s,ns)};
+$('#zi').onclick=()=>zoom(1.4);$('#zo').onclick=()=>zoom(1/1.4);$('#fit').onclick=()=>{ST.cat=null;saveST();build();fit()};
+$('#lg').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=isl[b.dataset.k];ST.cat=CATS.includes(i.c)?i.c:null;saveST();$$('#lg button').forEach(x=>x.classList.toggle('on',x===b));focusIsl(i.c)};
+$('#rnd').onclick=()=>{const x=randomPick(),p=pos[x.u];if(p)fly(p.x,p.y,.9);setTimeout(()=>openDrawer(x),p?750:0)};
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){ST.tab=b.dataset.t;ST.cat=null;ST.tags=[]}else ST.sort=b.dataset.s;build();fit()};
+$('#tg').onclick=e=>{const b=e.target.closest('button');if(b){toggleTag(b.dataset.t);build();fit()}};
+let qt;$('#q').value=ST.q;$('#q').oninput=()=>{clearTimeout(qt);qt=setTimeout(()=>{ST.q=$('#q').value;build();fit(500)},160)};
+const next=()=>{if(!hits.length)return;hi=(hi+1)%hits.length;const p=pos[hits[hi]];fly(p.x,p.y,1.1)};
+$('#nx').onclick=next;$('#q').onkeydown=e=>{if(e.key==='Enter')next()};
+document.addEventListener('fav',()=>{const k=[tx,ty,s];build();[tx,ty,s]=k;apply()});
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='0')fit();if(e.key==='+'||e.key==='=')zoom(1.3);if(e.key==='-')zoom(1/1.3)});
+addEventListener('resize',apply);
+build();s=Math.min(innerWidth/WW,VH()/WH)*.86;tx=(innerWidth-WW*s)/2;ty=(VH()-WH*s)/2;apply();
+setTimeout(()=>{if(ST.cat&&focusIsl(ST.cat))return;if(ST.q||ST.tags.length||ST.tab!=='tool')return fit();const i=isl.find(k=>k.c==='Component Libraries')||isl[0];i&&fly(i.x+(innerWidth/2-290)/.55,i.y+(VH()/2-150)/.55,.55)},700);
+</script></body></html>

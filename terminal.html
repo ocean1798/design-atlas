@@ -1,0 +1,78 @@
+<!doctype html><html lang="zh-CN" data-skin="terminal"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>atlas:~$ 设计工具终端</title>
+<link rel="stylesheet" href="fonts.css"><style>
+:root{--g:#7dff9b;--g2:#3fa860;--dim:#2f6b43;--bg:#050a07;--amb:#ffb547}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 40%,#0b1a10,var(--bg) 75%);color:var(--g);font:14px/1.6 Mono,"Noto Sans Mono CJK SC","PingFang SC",monospace;min-height:100vh;text-shadow:0 0 6px rgba(125,255,155,.45);overflow-x:hidden}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);z-index:80}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 180px rgba(0,0,0,.9);z-index:81;animation:flick 6s infinite}
+@keyframes flick{0%,100%{opacity:1}50%{opacity:.93}}
+.wrap{max-width:1180px;margin:0 auto;padding:34px 40px 80px}
+.top{display:flex;justify-content:space-between;color:var(--g2);font-size:12px;border-bottom:1px dashed var(--dim);padding-bottom:10px}
+.top b{color:var(--amb);font-weight:400}
+pre.logo{font-size:13px;line-height:1.1;color:var(--g);margin:34px 0 10px;white-space:pre}
+.sub{color:var(--g2);margin:0 0 30px}
+.k{display:flex;align-items:center;gap:14px;border:1px solid var(--g2);padding:22px 26px;background:rgba(10,30,16,.6);box-shadow:0 0 0 1px rgba(125,255,155,.1),0 0 40px rgba(125,255,155,.12) inset}
+.k span{font-size:30px;color:var(--amb)}.k input{flex:1;background:none;border:0;outline:none;color:var(--g);font:400 30px Mono,monospace;caret-color:var(--g);text-shadow:inherit}
+.k input::placeholder{color:var(--dim)}.k kbd{border:1px solid var(--dim);padding:2px 8px;font:12px Mono;color:var(--g2)}
+.cats{display:flex;flex-wrap:wrap;gap:4px 16px;margin:18px 0 6px;font-size:13px}.cats button{background:none;border:0;color:var(--g2);font:inherit;cursor:pointer;padding:0;text-shadow:inherit}
+.cats button:before{content:"--"}.cats button.on{color:var(--bg);background:var(--g);text-shadow:none;padding:0 4px}
+.hint{color:var(--dim);font-size:12px;margin:8px 0 22px}
+.log{border-top:1px dashed var(--dim);padding-top:14px}.cmd{color:var(--amb);margin:4px 0 10px}
+.row{display:grid;grid-template-columns:28px 34px 220px 1fr 200px;gap:12px;align-items:center;padding:5px 8px;cursor:pointer;border-left:2px solid transparent;opacity:0;animation:in .25s forwards}
+@keyframes in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.row .ix{color:var(--dim)}.row img,.row .fi{width:22px;height:22px;filter:grayscale(1) sepia(1) hue-rotate(80deg) saturate(3) brightness(.9);image-rendering:pixelated;border:1px solid var(--dim)}
+.row .fi{display:grid;place-items:center;font-size:10px}.row .n{color:#c9ffd6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .z{color:var(--g2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .dm{color:var(--dim);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .f{color:var(--amb)}
+.row.sel{background:rgba(125,255,155,.1);border-left-color:var(--g)}.row.sel .n:before{content:"▸ ";color:var(--amb)}
+.cur{display:inline-block;width:10px;height:18px;background:var(--g);vertical-align:-3px;animation:b 1s steps(1) infinite}@keyframes b{50%{opacity:0}}
+.more{color:var(--dim);margin:12px 8px}
+.dr{background:#06120a;border-left:1px solid var(--g2);color:var(--g)}.dimg img{filter:sepia(.4) hue-rotate(60deg) saturate(1.4) contrast(1.1)}.dph{color:var(--amb);background:#0a1a0f}
+.dr h2{font-size:30px;margin:6px 0;color:#c9ffd6}.dk,.do,.dm{color:var(--g2);font-size:12px}.dk:before{content:"$ cat "}.dzh{color:var(--amb)}
+.da>*{border:1px solid var(--g2);background:none;color:var(--g);font:13px Mono;padding:8px 14px}.da .go{background:var(--g);color:var(--bg);text-shadow:none}.dx{background:none;border:1px solid var(--g2);color:var(--g);font:14px Mono;padding:4px 9px}
+.toast{background:var(--g);color:var(--bg);font-family:Mono}
+.tabs{display:flex;gap:18px;margin:18px 0 0;font-size:13px}.tabs button,.tg button,.opt button{background:none;border:0;color:var(--g2);font:inherit;cursor:pointer;padding:0 4px;text-shadow:inherit}.tabs button.on{color:var(--bg);background:var(--amb);text-shadow:none}
+.tg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;margin:6px 0}.tg button:before{content:"+"}.tg button.on{color:var(--bg);background:var(--g);text-shadow:none}.tg i{font-style:normal;color:var(--dim)}
+.opt{display:flex;gap:14px;font-size:12.5px;margin:6px 0 0}.opt b{color:var(--dim);font-weight:400}.opt button.on{color:var(--amb)}
+</style></head><body><div class="wrap">
+<div class="top"><span>atlas@designer-index — tty1</span><span><b id="clk"></b> · <span id="tot"></span> entries loaded · offline</span></div>
+<pre class="logo">
+   █████╗ ████████╗██╗      █████╗ ███████╗
+  ██╔══██╗╚══██╔══╝██║     ██╔══██╗██╔════╝
+  ███████║   ██║   ██║     ███████║███████╗
+  ██╔══██║   ██║   ██║     ██╔══██║╚════██║
+  ██║  ██║   ██║   ███████╗██║  ██║███████║
+  ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝  设计工具终端 v3</pre>
+<p class="sub">// 一个键盘优先的设计 & 开发工具索引。输入即搜索，↑↓ 选择，Enter 查看详情，⌘/Ctrl+Enter 直接打开。</p>
+<label class="k"><span>❯</span><input id="q" placeholder="grep 工具、关键词、域名…  (例: react icon)" autofocus autocomplete="off"><kbd>⌘K</kbd></label>
+<div class="tabs" id="tabs"><span style="color:var(--dim)">view:</span><button data-t="tool">tools/工具</button><button data-t="person">people/人物</button><button data-t="fav">fav/收藏</button></div><div class="cats" id="cats"></div><div class="tg" id="tg"></div><div class="opt"><b>sort:</b><button data-s="cat">分类</button><button data-s="az">A-Z</button><b>·</b><button id="rndb">random/随机</button><b>· 固定配色 (CRT)</b></div>
+<div class="hint">[tab] 切换分类 · [↑↓] 移动 · [enter] 详情 · [f] 收藏 · [r] 随机 · [s] 排序 · [esc] 清空 · 点击 +tag 多选标签</div>
+<div class="log"><div class="cmd" id="cmd"></div><div id="out"></div></div></div>
+<script src="data.js"></script><script src="common.js"></script><script>
+let sel=0,res=[],lim=60;
+const cats=['all',...CATS];
+const slug=c=>c.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+function chrome(){$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===ST.tab));$$('.opt [data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s===ST.sort));
+ $('#cats').style.display=ST.tab==='tool'?'':'none';
+ $('#cats').innerHTML=cats.map(c=>`<button class="${(c==='all'?!ST.cat:ST.cat===c)?'on':''}" data-c="${esc(c)}">${c==='all'?'all':esc(slug(c))}</button>`).join('');
+ $('#tg').innerHTML=tagCounts().map(([t,n])=>`<button class="${ST.tags.includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)}<i>(${n})</i></button>`).join('')}
+function run(){saveST();res=results();sel=Math.min(sel,Math.max(res.length-1,0));
+ $('#cmd').innerHTML=`$ atlas find --view=${ST.tab}${ST.tab==='tool'&&ST.cat?' --cat='+esc(slug(ST.cat)):''}${ST.tags.map(t=>' --tag='+esc(t)).join('')} --sort=${ST.sort} "${esc(ST.q)}" <span style="color:var(--g2)">→ ${res.length} matches</span> <span class="cur"></span>`;
+ $('#out').innerHTML=res.slice(0,lim).map((x,i)=>`<div class="row ${i===sel?'sel':''}" data-i="${i}" style="animation-delay:${Math.min(i,30)*12}ms"><span class="ix">${String(i+1).padStart(2,'0')}</span>${x.fav?`<img src="${x.fav}" loading="lazy" alt="">`:`<span class="fi">${esc(ini(x.n))}</span>`}<span class="n">${esc(x.n)}${x.sp?' <span class="f">[sponsor]</span>':''}${x.oss?' <span style="color:var(--g2)">[oss]</span>':''}${FAV.has(x.u)?' <span class="f">★</span>':''}</span><span class="z">${esc(x.zh)} — ${esc(x.d)}</span><span class="dm">${esc(x.dom)}</span></div>`).join('')+(res.length>lim?`<div class="more" id="more">... ${res.length-lim} more — 按 [space] 或点击加载更多</div>`:'')+(res.length?'':'<div class="more">no matches. 试试 [esc] 清空条件</div>');chrome()}
+function mv(d){sel=Math.max(0,Math.min(res.length-1,sel+d));if(sel>=lim){lim+=60;run()}$$('.row').forEach(r=>r.classList.toggle('sel',+r.dataset.i===sel));$('.row.sel')?.scrollIntoView({block:'nearest'})}
+const reset=()=>{sel=0;lim=60;run()};
+$('#q').value=ST.q;$('#q').oninput=()=>{ST.q=$('#q').value;reset()};
+$('#cats').onclick=e=>{const b=e.target.closest('button');if(b){ST.cat=b.dataset.c==='all'?null:b.dataset.c;reset();$('#q').focus()}};
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b){ST.tab=b.dataset.t;ST.cat=null;ST.tags=[];reset()}};
+$('#tg').onclick=e=>{const b=e.target.closest('button');if(b){toggleTag(b.dataset.t);reset()}};
+$('.opt').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='rndb')return openDrawer(randomPick());ST.sort=b.dataset.s;reset()};
+$('#out').onclick=e=>{if(e.target.id==='more'){lim+=60;return run()}const r=e.target.closest('.row');if(r){sel=+r.dataset.i;mv(0);openDrawer(res[sel])}};
+document.addEventListener('fav',()=>run());
+addEventListener('keydown',e=>{const dOpen=$('#dr')?.classList.contains('on');
+ if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();closeDrawer();$('#q').focus();$('#q').select();return}
+ if(dOpen)return;if(e.key==='ArrowDown'){e.preventDefault();mv(1)}else if(e.key==='ArrowUp'){e.preventDefault();mv(-1)}
+ else if(e.key==='Enter'&&res[sel]){(e.metaKey||e.ctrlKey)?window.open(res[sel].u,'_blank'):openDrawer(res[sel])}
+ else if(e.key==='Tab'&&ST.tab==='tool'){e.preventDefault();const c=ST.cat||'all',i=cats.indexOf(c),n=cats[(i+(e.shiftKey?-1:1)+cats.length)%cats.length];ST.cat=n==='all'?null:n;reset()}
+ else if(e.key==='Escape'){$('#q').value='';Object.assign(ST,{q:'',cat:null,tags:[]});reset()}
+ else if(document.activeElement!==$('#q')||e.altKey){if(e.key==='f'&&res[sel]){togFav(res[sel].u)}if(e.key==='r')openDrawer(randomPick());if(e.key==='s'){ST.sort=ST.sort==='az'?'cat':'az';reset()}}
+ else if(e.key===' '&&!$('#q').value.trim()&&res.length>lim){e.preventDefault();lim+=60;run()}});
+$('#tot').textContent=D.length;setInterval(()=>$('#clk').textContent=new Date().toTimeString().slice(0,8),1000);run();
+</script></body></html>

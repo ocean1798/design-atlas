@@ -1,0 +1,206 @@
+<!doctype html><html lang="zh-CN" data-theme="light" data-skin="magazine" data-themed="1"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atlas · 设计工具图鉴</title>
+<style>
+@font-face{font-family:Disp;src:url(assets/fonts/display.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Disp;font-style:italic;src:url(assets/fonts/display-italic.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Inter;src:url(assets/fonts/inter.woff2) format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Mono;src:url(assets/fonts/mono.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#f2eee6;--bg2:#e9e4d9;--card:#fbf9f4;--ink:#141310;--ink2:#4a4740;--mute:#8a857a;--line:#d9d3c5;--acc:#ff4b1f;--acc-ink:#fff;--shadow:0 30px 60px -30px rgba(40,30,10,.35);
+--sans:Inter,"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;--disp:Disp,"Songti SC","Noto Serif CJK SC","STSong",Georgia,serif;--mono:Mono,ui-monospace,Menlo,monospace;--ease:cubic-bezier(.16,1,.3,1)}
+[data-theme=dark]{--bg:#0f0e0c;--bg2:#171613;--card:#1a1916;--ink:#f1ece2;--ink2:#c4bdb0;--mute:#8a8478;--line:#2c2a25;--acc:#ff5a2e;--shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.07;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+[data-theme=dark] body:before{mix-blend-mode:screen;opacity:.05}
+a{color:inherit;text-decoration:none}button,input,select{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0}
+::selection{background:var(--acc);color:#fff}
+.app{display:grid;grid-template-columns:268px 1fr;transition:grid-template-columns .45s var(--ease)}
+.app.collapsed{grid-template-columns:64px 1fr}
+/* sidebar */
+aside{position:sticky;top:40px;height:calc(100vh - 40px);overflow:auto;border-right:1px solid var(--line);padding:22px 14px 30px;scrollbar-width:thin}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px 22px;white-space:nowrap}
+.mark{width:30px;height:30px;flex:none;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:italic 21px/1 var(--disp)}
+.brand b{font:400 24px/1 var(--disp);letter-spacing:-.01em}.brand b i{color:var(--acc)}
+.collapse{margin-left:auto;width:26px;height:26px;border-radius:8px;color:var(--mute)}.collapse:hover{background:var(--bg2);color:var(--ink)}
+.collapsed aside .hide{display:none}.collapsed .collapse{transform:rotate(180deg);margin:0}.collapsed .brand{flex-direction:column;padding-bottom:16px}
+.nav-all,.g-h,.sub{display:flex;align-items:center;width:100%;gap:10px;padding:8px 10px;border-radius:10px;text-align:left;transition:background .2s,color .2s}
+.nav-all:hover,.g-h:hover,.sub:hover{background:var(--bg2)}
+.nav-all.on,.sub.on{background:var(--ink);color:var(--bg)}.nav-all.on .n,.sub.on .n{color:var(--bg);opacity:.6}
+.g{margin-top:6px}.g-h{font-weight:600}.g-h .ix{font:11px var(--mono);color:var(--acc);width:20px}
+.g-h .car{margin-left:auto;transition:transform .35s var(--ease);color:var(--mute)}.g.open .car{transform:rotate(90deg)}
+.n{margin-left:auto;font:11px var(--mono);color:var(--mute)}
+.subs{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}.g.open .subs{grid-template-rows:1fr}.subs>div{overflow:hidden;padding-left:22px}
+.sub{padding:6px 10px;font-size:13px;color:var(--ink2)}.sub small{color:var(--mute);font-size:11px}.sub.on small{color:var(--bg);opacity:.6}
+.collapsed .g-h{justify-content:center;padding:10px 0}.collapsed .g-h .ix{width:auto;font-size:13px}
+.side-foot{margin-top:28px;padding:14px 10px;border-top:1px solid var(--line);font-size:12px;color:var(--mute)}
+/* top bar */
+main{min-width:0}
+.bar{position:sticky;top:40px;z-index:20;display:flex;gap:10px;align-items:center;padding:14px 44px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid transparent;transition:border-color .3s}
+.bar.stuck{border-color:var(--line)}
+.seg{display:flex;padding:3px;border:1px solid var(--line);border-radius:999px;position:relative}
+.seg button{padding:6px 15px;border-radius:999px;position:relative;z-index:1;transition:color .3s;font-size:13px}.seg button.on{color:var(--bg)}
+.seg .pill{position:absolute;top:3px;bottom:3px;border-radius:999px;background:var(--ink);transition:all .45s var(--ease)}
+.search{flex:1;position:relative;max-width:520px}.search input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 44px 9px 38px;outline:none;transition:border-color .2s,box-shadow .3s}
+.search input:focus{border-color:var(--ink);box-shadow:0 0 0 5px color-mix(in srgb,var(--acc) 18%,transparent)}
+.search svg{position:absolute;left:14px;top:11px;color:var(--mute)}.search kbd{position:absolute;right:12px;top:8px;font:11px var(--mono);padding:2px 7px;border:1px solid var(--line);border-radius:6px;color:var(--mute)}
+.ib{border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;white-space:nowrap;transition:border-color .2s,background .2s,transform .2s var(--ease)}.ib:hover{border-color:var(--ink)}.ib:active{transform:scale(.95)}
+select.ib{appearance:none;background:transparent;padding-right:14px}
+.sp{flex:1}
+/* hero */
+.hero{padding:56px 44px 28px;display:grid;grid-template-columns:1fr auto;gap:30px;align-items:end;border-bottom:1px solid var(--line)}
+.kick{font:12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:flex;gap:14px}.kick b{color:var(--acc);font-weight:500}
+.hero h1{font:400 clamp(64px,9vw,148px)/.86 var(--disp);letter-spacing:-.035em;margin:18px 0 0}
+.hero h1 i{color:var(--acc)}.hero h1 .cn{display:block;font-size:.34em;letter-spacing:0;margin-top:.5em;font-family:var(--disp);color:var(--ink2)}
+.stats{display:grid;grid-template-columns:repeat(3,auto);gap:0;border-left:1px solid var(--line)}
+.stat{padding:0 26px;border-right:1px solid var(--line)}.stat b{display:block;font:400 64px/1 var(--disp);letter-spacing:-.03em}.stat span{font-size:12px;color:var(--mute)}
+.lede{grid-column:1/-1;display:flex;justify-content:space-between;gap:30px;color:var(--ink2);max-width:none;font-size:15px}
+.lede p{margin:0;max-width:560px}
+/* chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:18px 44px 0}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--ink2);transition:all .25s var(--ease)}
+.chip:hover{border-color:var(--ink)}.chip.on{background:var(--acc);border-color:var(--acc);color:#fff;transform:translateY(-1px)}.chip i{font:normal 10px var(--mono);opacity:.6;margin-left:4px}
+/* featured */
+.feat{padding:40px 0 10px}.sh{display:flex;align-items:baseline;gap:16px;padding:0 44px 18px}
+.sh .no{font:12px var(--mono);color:var(--acc)}.sh h2{font:400 44px/1 var(--disp);letter-spacing:-.02em;margin:0}.sh h2 small{font:500 15px var(--sans);color:var(--mute);margin-left:12px;letter-spacing:0}
+.sh .rule{flex:1;height:1px;background:var(--line);align-self:center}.sh .cnt{font:12px var(--mono);color:var(--mute)}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(380px,32%);gap:18px;overflow-x:auto;padding:0 44px 20px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.strip .tile{scroll-snap-align:start;aspect-ratio:4/3.3}
+/* bento */
+.sec{padding:46px 0 10px}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:150px;grid-auto-flow:dense;gap:16px;padding:0 44px}
+.tile{position:relative;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--line);cursor:pointer;display:flex;flex-direction:column;
+ transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .3s;opacity:0;transform:translateY(24px)}
+.tile.in{opacity:1;transform:none;transition:opacity .7s var(--ease),transform .7s var(--ease),box-shadow .5s var(--ease),border-color .3s}
+.tile.in:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.s1{grid-row:span 2}.s-wide{grid-column:span 2;grid-row:span 2}.s-hero{grid-column:span 2;grid-row:span 3}.s-tall{grid-row:span 3}
+.media{flex:1;min-height:0;overflow:hidden;position:relative;background:var(--bg2)}
+.media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.1s var(--ease),opacity .6s;opacity:0}.media img.ok{opacity:1}
+.tile:hover .media img{transform:scale(1.06)}
+.ph{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+.ph span{font:italic 400 clamp(48px,7vw,110px)/1 var(--disp);letter-spacing:-.04em;color:var(--ink);opacity:.9;transition:transform 1s var(--ease)}.tile:hover .ph span{transform:scale(1.08) rotate(-2deg)}
+.ph:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 30%,var(--c),transparent 55%),radial-gradient(circle at 80% 70%,color-mix(in srgb,var(--acc) 50%,transparent),transparent 50%);opacity:.55;filter:blur(10px)}
+.cap{padding:12px 14px 13px;display:flex;flex-direction:column;gap:3px;background:var(--card);position:relative}
+.cap .r{display:flex;gap:8px;align-items:center}
+.fav{width:18px;height:18px;border-radius:5px;flex:none;object-fit:contain;background:#fff}
+.fv{width:18px;height:18px;border-radius:5px;flex:none;display:grid;place-items:center;background:var(--ink);color:var(--bg);font:italic 12px var(--disp)}
+.nm{font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm{margin-left:auto;font:11px var(--mono);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.zh{font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds{font-size:12.5px;color:var(--mute);display:none}
+.s-wide .ds,.s-hero .ds,.strip .ds{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.s-hero .nm,.strip .nm{font:400 30px/1.05 var(--disp);letter-spacing:-.01em}
+.s1 .cap,.bento .tile:not(.s-wide):not(.s-hero):not(.s-tall):not(.s1) .cap{padding:10px 12px}
+.tags{position:absolute;top:12px;left:12px;display:flex;gap:6px;z-index:2}
+.tg{font:500 10.5px var(--sans);padding:3px 9px;border-radius:999px;backdrop-filter:blur(10px);background:rgba(255,255,255,.82);color:#1a1a1a}
+.tg.oss{background:rgba(20,120,70,.88);color:#fff}.tg.sp{background:var(--acc);color:#fff}
+.star{position:absolute;top:10px;right:10px;z-index:2;width:32px;height:32px;border-radius:50%;background:rgba(15,14,12,.5);backdrop-filter:blur(8px);color:#fff;font-size:14px;opacity:0;transform:scale(.8);transition:all .3s var(--ease)}
+.tile:hover .star,.star.on{opacity:1;transform:none}.star.on{color:#ffc93c}
+.empty{padding:120px 44px;text-align:center;font:italic 32px var(--disp);color:var(--mute)}
+.results.fade{animation:fade .5s var(--ease)}@keyframes fade{from{opacity:.0;transform:translateY(8px)}}
+footer{padding:60px 44px 50px;margin-top:60px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--mute);font-size:12px}
+footer b{font:italic 400 28px var(--disp);color:var(--ink)}
+/* drawer */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(10,9,7,.5);opacity:0;pointer-events:none;transition:opacity .45s var(--ease);backdrop-filter:blur(4px)}.ov.on{opacity:1;pointer-events:auto}
+.dr{position:fixed;z-index:51;top:12px;right:12px;bottom:12px;width:min(580px,calc(100% - 24px));background:var(--card);border-radius:22px;overflow:auto;transform:translateX(110%);transition:transform .6s var(--ease);box-shadow:0 40px 120px -20px rgba(0,0,0,.5);border:1px solid var(--line)}
+.dr.on{transform:none}
+.dr .hd{position:relative;aspect-ratio:16/10;background:var(--bg2);overflow:hidden}.dr .hd img{width:100%;height:100%;object-fit:cover}
+.dr .x{position:absolute;top:14px;right:14px;z-index:3;width:38px;height:38px;border-radius:50%;background:rgba(15,14,12,.55);color:#fff;backdrop-filter:blur(8px);font-size:16px;transition:transform .3s var(--ease)}.dr .x:hover{transform:rotate(90deg)}
+.db{padding:26px 30px 34px}.db .kick{font-size:11px}
+.db h2{font:400 54px/1 var(--disp);letter-spacing:-.025em;margin:14px 0 10px}
+.db .zhl{font-size:17px;font-weight:500;margin:0 0 14px}
+.db .ds2{color:var(--ink2);font-size:15px;line-height:1.65;margin:0 0 10px}
+.db .src{font-size:12.5px;color:var(--mute);border-left:2px solid var(--acc);padding-left:12px;margin:16px 0}
+.db dl{display:grid;grid-template-columns:90px 1fr;gap:10px 14px;margin:22px 0;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px}
+.db dt{color:var(--mute);font:11px var(--mono);text-transform:uppercase;letter-spacing:.08em;padding-top:2px}.db dd{margin:0}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.pri{background:var(--acc);color:#fff;border-color:var(--acc);padding:11px 20px;font-weight:600}.pri:hover{border-color:var(--acc);filter:brightness(1.08)}
+.act2{padding:11px 18px}
+.toast{position:fixed;bottom:30px;left:50%;z-index:60;transform:translate(-50%,30px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13px;transition:all .45s var(--ease)}.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1100px){.bento{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.stats{border-left:0}.stat:first-child{padding-left:0}}
+@media(max-width:780px){.app,.app.collapsed{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.bar,.hero,.chips,.sh,.bento,.strip,footer{padding-left:18px;padding-right:18px}.bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:130px}.s-hero,.s-wide{grid-column:span 2}.bar{flex-wrap:wrap}.strip{grid-auto-columns:80%}.lede{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.tile{opacity:1;transform:none}}
+</style></head><body>
+<div class="app" id="app">
+<aside><div class="brand"><span class="mark">a</span><b class="hide">Atlas<i>.</i></b><button class="collapse" id="col" title="收起/展开侧栏">‹</button></div>
+<button class="nav-all on" id="all"><span class="hide">全部内容</span><span class="n hide" id="alln"></span></button><div id="nav"></div>
+<div class="side-foot hide">按 <b>/</b> 搜索 · <b>Esc</b> 关闭<br>离线可用 · 收藏保存在本机</div></aside>
+<main><div class="bar" id="bar"><div class="seg" id="tabs"><span class="pill"></span><button data-t="tool" class="on">工具</button><button data-t="person">人物</button><button data-t="fav">收藏 <span id="fc"></span></button></div>
+<label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="搜索工具、简介或域名…" autocomplete="off"><kbd>/</kbd></label>
+<span class="sp"></span><select class="ib" id="sort"><option value="cat">排序：分类</option><option value="az">排序：A–Z</option></select>
+<button class="ib" id="rnd">随机一个 ↻</button><button class="ib" id="theme" title="深色 / 浅色">◐</button></div>
+<div id="view"></div>
+<footer><b>Atlas.</b><span>一份离线的设计与开发工具索引 · 预览图来自各站点自身的 og:image</span></footer></main></div>
+<div class="ov" id="ov"></div><div class="dr" id="dr"></div><div class="toast" id="toast"></div>
+<script src="data.js"></script><script src="common.js"></script>
+<script>{
+const $=s=>document.querySelector(s),LS=localStorage;
+const GROUPS=[['灵感','Inspire',['Design Galleries','Reading','Interface Design']],['构建','Build',['Component Libraries','Development','Agents & MCP','Deploy']],['视觉','Visual',['Icons','Type','Color','Motion','3D','Shaders']],['效率','Workflow',['Utilities','Desktop','Video & Capture','Whiteboard']],['推荐','Featured',['赞助位 Sponsors']]];
+const CN={};D.forEach(x=>CN[x.c]=x.cn);
+const S={tab:ST.tab,cat:ST.cat,grp:null,tags:new Set(ST.tags),q:ST.q,sort:ST.sort,fav:new Set(JSON.parse(LS.getItem('atlas-fav')||'[]')),open:new Set(JSON.parse(LS.getItem('atlas-open')||'[0,1]'))};
+document.documentElement.dataset.theme=LS.getItem('atlas-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(LS.getItem('atlas-col')==='1')$('#app').classList.add('collapsed');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ini=n=>(n.match(/[A-Za-z0-9\u4e00-\u9fa5]+/g)||['·']).map(w=>w[0]).join('').slice(0,2);
+const ph=x=>`<div class="ph" style="--c:${x.col}"><span>${esc(ini(x.n))}</span></div>`;
+const favi=x=>x.fav?`<img class="fav" loading="lazy" src="${x.fav}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fv',textContent:'${esc(ini(x.n)[0])}'}))">`:`<span class="fv">${esc(ini(x.n)[0])}</span>`;
+const pool=()=>S.tab==='fav'?D.filter(x=>S.fav.has(x.u)):D.filter(x=>x.p===(S.tab==='person'));
+const match=x=>{const q=S.q.toLowerCase().trim();return [...S.tags].every(t=>x.tags.includes(t))&&(!q||(x.n+' '+x.d+' '+x.o+' '+x.zh+' '+x.dom+' '+x.cn+' '+x.c).toLowerCase().includes(q))};
+const srt=a=>a.sort((a,b)=>S.sort==='az'?a.n.localeCompare(b.n):(b.sp-a.sp)||(!!b.img-!!a.img)||a.n.localeCompare(b.n));
+function nav(){const p=pool(),cnt={};p.forEach(x=>cnt[x.c]=(cnt[x.c]||0)+1);$('#alln').textContent=p.length;$('#all').classList.toggle('on',!S.cat&&!S.grp);
+ if(S.tab!=='tool'){$('#nav').innerHTML='';return}
+ $('#nav').innerHTML=GROUPS.map(([g,e,cs],i)=>{const n=cs.reduce((s,c)=>s+(cnt[c]||0),0);return `<div class="g ${S.open.has(i)?'open':''}" data-g="${i}"><button class="g-h ${S.grp===i&&!S.cat?'on':''}" data-gi="${i}"><span class="ix">0${i+1}</span><span class="hide">${g} <small style="color:var(--mute);font-weight:400">${e}</small></span><span class="n hide">${n}</span><span class="car hide">›</span></button>
+ <div class="subs"><div>${cs.map(c=>`<button class="sub ${S.cat===c?'on':''}" data-c="${esc(c)}"><span>${esc(CN[c]||c)} <small>${esc(c.replace('赞助位 ',''))}</small></span><span class="n">${cnt[c]||0}</span></button>`).join('')}</div></div></div>`}).join('')}
+function chips(list){const m={};list.forEach(x=>x.tags.forEach(t=>m[t]=(m[t]||0)+1));S.tags.forEach(t=>m[t]=m[t]||0);
+ return `<div class="chips">${Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([t,n])=>`<button class="chip ${S.tags.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)}<i>${n}</i></button>`).join('')}</div>`}
+const SIZE=(i,n)=>i===0&&n>4?'s-hero':(i%9===5&&n>8)?'s-wide':(i%7===3?'s-tall':'s1');
+function tile(x,cls){return `<article class="tile ${cls}" data-u="${esc(x.u)}" tabindex="0"><div class="media">${x.img?`<img loading="lazy" src="${x.img}" alt="" onload="this.classList.add('ok')" onerror="this.outerHTML=PH(this)">`:ph(x)}
+<div class="tags">${x.sp?'<span class="tg sp">赞助</span>':''}${x.oss?'<span class="tg oss">免费 / 开源</span>':''}</div></div>
+<button class="star ${S.fav.has(x.u)?'on':''}" data-s="${esc(x.u)}" title="收藏">★</button>
+<div class="cap"><div class="r">${favi(x)}<span class="nm">${esc(x.n)}</span><span class="dm">${esc(x.dom)}</span></div><div class="zh">${esc(x.zh)}</div><div class="ds">${esc(x.d)}</div></div></article>`}
+window.PH=img=>{const x=D.find(d=>d.u===img.closest('.tile,.dr').dataset.u)||D[0];return ph(x)};
+function section(no,title,sub,items){return `<section class="sec"><div class="sh"><span class="no">${no}</span><h2>${esc(title)}<small>${esc(sub)}</small></h2><span class="rule"></span><span class="cnt">${items.length} 项</span></div><div class="bento">${items.map((x,i)=>tile(x,SIZE(i,items.length))).join('')}</div></section>`}
+function render(anim=true){Object.assign(ST,{tab:S.tab,cat:S.cat,tags:[...S.tags],q:S.q,sort:S.sort});saveST();nav();const p=pool(),fl=p.filter(match),filtering=S.q||S.tags.size;let h='';
+ const tot=D.filter(x=>!x.p).length,ppl=D.filter(x=>x.p).length,cats=new Set(D.filter(x=>!x.p).map(x=>x.c)).size;
+ if(S.tab==='tool'&&!S.cat&&S.grp===null&&!filtering){
+  h+=`<header class="hero"><div><div class="kick"><b>●</b><span>Vol. 01</span><span>Design &amp; Dev Index</span><span>${new Date().getFullYear()}</span></div><h1>The <i>Atlas</i> of<br>good tools.<span class="cn">设计与开发工具图鉴</span></h1></div>
+  <div class="stats"><div class="stat"><b>${tot}</b><span>件工具</span></div><div class="stat"><b>${cats}</b><span>个分类</span></div><div class="stat"><b>${ppl}</b><span>位创作者</span></div></div>
+  <div class="lede"><p>从组件库、图标、字体到 AI 智能体——一份为设计工程师整理的离线索引。点击任意卡片查看详情，按 <b>/</b> 立即搜索。</p></div></header>`;
+  const feat=srt(p.filter(x=>x.sp)).concat(p.filter(x=>!x.sp&&x.img&&x.oss).sort((a,b)=>a.i*7%13-b.i*7%13).slice(0,6));
+  h+=chips(p)+`<section class="feat"><div class="sh"><span class="no">★</span><h2>本期精选<small>Featured</small></h2><span class="rule"></span><span class="cnt">左右滑动 →</span></div><div class="strip">${feat.map(x=>tile(x,'')).join('')}</div></section>`;
+  let k=0;GROUPS.forEach(([g,e,cs])=>cs.forEach(c=>{if(c.includes('赞助'))return;const it=srt(p.filter(x=>x.c===c));if(it.length)h+=section(String(++k).padStart(2,'0'),CN[c]||c,c,it)}));
+ }else{
+  let list=fl;if(S.tab==='tool'){if(S.cat)list=list.filter(x=>x.c===S.cat);else if(S.grp!==null)list=list.filter(x=>GROUPS[S.grp][2].includes(x.c))}
+  const t=S.tab==='person'?['人物','People']:S.tab==='fav'?['我的收藏','Favorites']:S.cat?[CN[S.cat],S.cat]:S.grp!==null?[GROUPS[S.grp][0],GROUPS[S.grp][1]]:['搜索结果','Results'];
+  h+=chips(S.tab==='tool'&&(S.cat||S.grp!==null)?p.filter(x=>S.cat?x.c===S.cat:GROUPS[S.grp][2].includes(x.c)):p);
+  if(S.tab==='tool'&&!S.cat&&S.grp!==null&&!filtering){let k=0;GROUPS[S.grp][2].forEach(c=>{const it=srt(list.filter(x=>x.c===c));if(it.length)h+=section(String(++k).padStart(2,'0'),CN[c],c,it)})}
+  else h+=list.length?section('—',t[0],t[1]+(S.q?` · “${S.q}”`:''),srt(list)):`<div class="empty">${S.tab==='fav'?'还没有收藏 —— 点卡片右上角的 ★':'没有找到匹配的条目'}</div>`;
+ }
+ const v=$('#view');v.innerHTML=`<div class="results ${anim?'fade':''}">${h}</div>`;$('#fc').textContent=S.fav.size||'';observe()}
+let io;function observe(){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const el=e.target,sib=[...el.parentNode.children].indexOf(el);el.style.transitionDelay=Math.min(sib%8,7)*55+'ms';el.classList.add('in');setTimeout(()=>el.style.transitionDelay='',900);io.unobserve(el)}}),{rootMargin:'0px 0px -5% 0px'});document.querySelectorAll('.tile').forEach(t=>io.observe(t))}
+function open(x){const d=$('#dr');d.dataset.u=x.u;d.innerHTML=`<div class="hd">${x.img?`<img src="${x.img}" alt="" onerror="this.outerHTML=PH(this)">`:ph(x)}<button class="x" id="cl" title="关闭">✕</button></div>
+<div class="db"><div class="kick"><b>●</b><span>${esc(x.cn)}</span><span>${esc(x.c.replace('赞助位 ',''))}</span></div><h2>${esc(x.n)}</h2><p class="zhl">${esc(x.zh)}</p><p class="ds2">${esc(x.d)}</p>
+${x.o&&x.o!==x.d?`<p class="src">索引简介 · ${esc(x.o)}</p>`:''}<dl><dt>域名</dt><dd style="font-family:var(--mono)">${favi(x)} ${esc(x.dom)}</dd><dt>标签</dt><dd>${x.tags.map(esc).join(' · ')||'—'}</dd><dt>状态</dt><dd>${[x.oss?'免费 / 开源':'',x.sp?'赞助':'',S.fav.has(x.u)?'已收藏':''].filter(Boolean).join(' · ')||'—'}</dd></dl>
+<div class="acts"><a class="ib pri" href="${esc(x.u)}" target="_blank" rel="noopener">打开网站 ↗</a><button class="ib act2" id="cp">复制链接</button><button class="ib act2" id="fv">${S.fav.has(x.u)?'★ 已收藏':'☆ 收藏'}</button></div></div>`;
+ d.scrollTop=0;d.classList.add('on');$('#ov').classList.add('on');$('#cl').onclick=close;
+ $('#cp').onclick=()=>{const done=()=>toast('链接已复制');navigator.clipboard?navigator.clipboard.writeText(x.u).then(done,()=>fb()):fb();function fb(){const t=document.createElement('textarea');t.value=x.u;document.body.append(t);t.select();document.execCommand('copy');t.remove();done()}};
+ $('#fv').onclick=()=>{tf(x.u);open(x)}}
+function close(){$('#dr').classList.remove('on');$('#ov').classList.remove('on')}
+function tf(u){S.fav.has(u)?S.fav.delete(u):S.fav.add(u);LS.setItem('atlas-fav',JSON.stringify([...S.fav]));document.querySelectorAll(`.star[data-s="${CSS.escape(u)}"]`).forEach(s=>s.classList.toggle('on',S.fav.has(u)));$('#fc').textContent=S.fav.size||'';if(S.tab==='fav')render(false)}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1500)}
+function pill(){const b=$('#tabs button.on'),p=$('#tabs .pill');p.style.left=b.offsetLeft+'px';p.style.width=b.offsetWidth+'px'}
+const go=()=>{render();scrollTo({top:0})};
+$('#all').onclick=()=>{S.cat=null;S.grp=null;S.tags.clear();go()};
+$('#nav').onclick=e=>{const s=e.target.closest('.sub');if(s){S.cat=s.dataset.c;S.grp=null;S.tags.clear();return go()}
+ const g=e.target.closest('.g-h');if(g){const i=+g.dataset.gi;if($('#app').classList.contains('collapsed')){S.grp=i;S.cat=null;return go()}
+  if(S.open.has(i)&&S.grp===i&&!S.cat)S.open.delete(i);else S.open.add(i);S.grp=i;S.cat=null;S.tags.clear();LS.setItem('atlas-open',JSON.stringify([...S.open]));go()}};
+$('#view').onclick=e=>{const c=e.target.closest('.chip');if(c){const t=c.dataset.t;S.tags.has(t)?S.tags.delete(t):S.tags.add(t);return render()}
+ const s=e.target.closest('.star');if(s){e.stopPropagation();return tf(s.dataset.s)}const t=e.target.closest('.tile');if(t)open(D.find(x=>x.u===t.dataset.u))};
+$('#view').onkeydown=e=>{if(e.key==='Enter'&&e.target.classList.contains('tile'))open(D.find(x=>x.u===e.target.dataset.u))};
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.t;S.cat=null;S.grp=null;S.tags.clear();document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));pill();go()};
+let qt;$('#q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{S.q=e.target.value;render()},120)};$('#sort').onchange=e=>{S.sort=e.target.value;render()};
+$('#rnd').onclick=()=>{const p=pool().filter(match),a=p.length?p:D;open(a[Math.floor(Math.random()*a.length)])};
+$('#theme').onclick=()=>{const h=document.documentElement,t=h.dataset.theme==='dark'?'light':'dark';h.dataset.theme=t;LS.setItem('atlas-theme',t)};
+$('#col').onclick=()=>{const a=$('#app');a.classList.toggle('collapsed');LS.setItem('atlas-col',a.classList.contains('collapsed')?'1':'0')};
+$('#ov').onclick=close;addEventListener('scroll',()=>$('#bar').classList.toggle('stuck',scrollY>10),{passive:true});
+addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==$('#q')){e.preventDefault();$('#q').focus()}if(e.key==='Escape'){close();$('#q').blur()}});
+$('#q').value=S.q;$('#sort').value=S.sort;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===S.tab));if(S.cat)S.open.add(GROUPS.findIndex(g=>g[2].includes(S.cat)));addEventListener('resize',pill);render(false);requestAnimationFrame(pill);document.fonts&&document.fonts.ready.then(pill);
+}</script></body></html>
